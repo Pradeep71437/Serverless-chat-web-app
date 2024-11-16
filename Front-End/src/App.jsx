@@ -1,35 +1,81 @@
-import React from 'react'
-import './index.css'
-import profile from './assets/pradeep.jpeg'
-import profile2 from './assets/manthraa.jpg'
-const App = () => {
-  
-  return (
-    <div className='flex'>
-      <div className='lg:w-2/6'>
-      <div className='mb-10 '>
-        <h1 className='text-[35px] hidden lg:flex text-black font-bold p-7'>Chats</h1>
-      </div>
-      <div className='px-3'>
-      <div className='bg-gray-300 shadow-sm mb-3 p-2 lg:p-4 relative rounded-xl cursor-pointer flex'>
-        <div className="rounded-full border-1 border-black  relative w-10 h-10 lg:w-14 lg:h-14 overflow-hidden">
-          <div className='flex justify-center items-center'>
-          <img src={profile} alt="" className="w-full h-full object-cover " />
-          </div>
-        </div>    
-        <p className='font-medium text-[20px] absolute top-7 left-[80px]  hidden lg:flex '>Pradeep</p>
-      </div>
+import React, { useState, useEffect } from "react";
+import CallController from './components/calls/CallController';
+import { auth, provider } from "./Firebase/firebase-config";
+import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
+import './index.css';
+import profile from './assets/pradeep.jpeg';
+import profile2 from './assets/manthraa.jpg';
 
-      <div className='p-2 lg:p-4 relative rounded-xl cursor-pointer flex'>
-        <div className="rounded-full border-1 border-black  relative  w-10 h-10 lg:w-14 lg:h-14  overflow-hidden">
-           <img src={profile2} alt="" className="w-full h-full object-cover" />
-        </div>    
-        <p className='font-medium text-[20px] absolute top-7 left-[80px]  hidden lg:flex '>Manthraa</p>
-      </div>
-      </div>
-      
-      </div>
-    <div className="flex-1 p:2 lg:w-4/6 border-l-2 sm:p-6 justify-between flex flex-col h-screen">
+const App = () => {
+   const [user, setUser] = useState(null);
+
+   // Listen for authentication state changes
+   useEffect(() => {
+      const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+         if (currentUser) {
+            setUser(currentUser);
+         } else {
+            setUser(null);
+         }
+      });
+
+      // Cleanup the listener on component unmount
+      return () => unsubscribe();
+   }, []);
+
+   // Sign in with Google
+   const handleGoogleSignIn = async () => {
+      try {
+         const result = await signInWithPopup(auth, provider);
+         setUser(result.user);
+         console.log("User Info:", result.user);
+      } catch (error) {
+         if (error.code === "auth/popup-closed-by-user") {
+            console.log("Sign-in canceled by user.");
+         } else {
+            console.error("Error during sign-in:", error.message);
+         }
+      }
+   };
+
+   // Sign out
+   const handleSignOut = async () => {
+      try {
+         await signOut(auth);
+         setUser(null);
+      } catch (error) {
+         console.error("Error during sign-out:", error);
+      }
+   };
+
+   return (
+      <>
+         {!user ? (
+            <button onClick={handleGoogleSignIn}>Sign in with Google</button>
+         ) : (
+            <div className='flex'>
+               <div className='lg:w-3/12'>
+                  <div className='mb-10 flex justify-between items-center'>
+                     <h1 className='text-[35px] hidden lg:flex text-black font-bold p-7'>Chats</h1>
+                     <div>
+                        <button onClick={handleSignOut} className="mr-10 px-4 py-2 rounded-lg bg-red-600 text-white">
+                           Sign Out
+                        </button>
+                     </div>
+                  </div>
+                  <div className='px-3'>
+                     <div className='bg-gray-300 shadow-sm mb-3 p-2 lg:p-4 relative rounded-xl cursor-pointer flex'>
+                        <div className="rounded-full border-1 border-black relative w-10 h-10 lg:w-14 lg:h-14 overflow-hidden">
+                           <img src={profile} alt="" className="w-full h-full object-cover" />
+                        </div>
+                        <p className='font-medium text-[20px] absolute top-7 left-[80px] hidden lg:flex'>
+                           {user.displayName}
+                        </p>
+                     </div>
+                     {/* Add more user UI here */}
+                  </div>
+               </div>
+               <div className="flex-1 p:2 lg:w-9/12 border-l-2 sm:p-6 justify-between flex flex-col h-screen">
    <div className="flex sm:items-center justify-between py-3 border-b-2 border-gray-200">
       <div className="relative flex items-center space-x-4">
          <div className="relative">
@@ -45,30 +91,20 @@ const App = () => {
          {/* <img src="https://images.unsplash.com/photo-1549078642-b2ba4bda0cdb?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=3&amp;w=144&amp;h=144" alt="" className="w-10 sm:w-16 h-10 sm:h-16 rounded-full"/> */}
         
          </div>
-         <div className="flex flex-col leading-tight">
+         <div className="flex flex-col justify-between items-center leading-tight">
             <div className="text-2xl mt-1 flex items-center">
                <span className="text-gray-700 mr-3">Pradeep</span>
             </div>
             <span className="text-lg text-gray-600">Junior Developer</span>
          </div>
+         <nav>
+         {/* <a href="#" onClick={() => setActiveCall('audio')}>Audio Call</a>
+         <a href="#" onClick={() => setActiveCall('video')}>Video Call</a> */}
+         <a href="">Audio Call</a>
+         <a href="">Video Call</a>
+         </nav>
+         {/* <CallController /> */}
       </div>
-      {/* <div className="flex items-center space-x-2">
-         <button type="button" className="inline-flex items-center justify-center rounded-lg border h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6">
-               <path stroke-linecap="round" strokeLinejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-         </button>
-         <button type="button" className="inline-flex items-center justify-center rounded-lg border h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6">
-               <path stroke-linecap="round" strokeLinejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-            </svg>
-         </button>
-         <button type="button" className="inline-flex items-center justify-center rounded-lg border h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6">
-               <path stroke-linecap="round" strokeLinejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-            </svg>
-         </button>
-      </div> */}
    </div>
    <div id="messages" className="flex flex-col space-y-4 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch">
       <div className="chat-message">
@@ -219,8 +255,11 @@ const App = () => {
       </div>
    </div>
 </div>
-</div>
-  )
-}
 
-export default App
+            </div>
+         )}
+      </>
+   );
+};
+
+export default App;

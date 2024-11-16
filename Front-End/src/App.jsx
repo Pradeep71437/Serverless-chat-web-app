@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import CallController from './components/calls/CallController';
 import { auth, provider } from "./Firebase/firebase-config";
 import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
 import './index.css';
@@ -91,7 +90,7 @@ const App = () => {
          {/* <img src="https://images.unsplash.com/photo-1549078642-b2ba4bda0cdb?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=3&amp;w=144&amp;h=144" alt="" className="w-10 sm:w-16 h-10 sm:h-16 rounded-full"/> */}
         
          </div>
-         <div className="flex flex-col justify-between items-center leading-tight">
+         <div className="flex flex-col  leading-tight">
             <div className="text-2xl mt-1 flex items-center">
                <span className="text-gray-700 mr-3">Pradeep</span>
             </div>
@@ -100,8 +99,8 @@ const App = () => {
          <nav>
          {/* <a href="#" onClick={() => setActiveCall('audio')}>Audio Call</a>
          <a href="#" onClick={() => setActiveCall('video')}>Video Call</a> */}
-         <a href="">Audio Call</a>
-         <a href="">Video Call</a>
+         {/* <a href="">Audio Call</a>
+         <a href="">Video Call</a> */}
          </nav>
          {/* <CallController /> */}
       </div>
